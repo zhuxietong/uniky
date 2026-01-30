@@ -3,8 +3,8 @@
 // 以便在项目中全局使用这些类型定义，避免了手动维护全局类型定义文件的麻烦。
 
 import type { Plugin } from 'vite';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 interface ExportInfo {
   name: string;

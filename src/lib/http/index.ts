@@ -1,2 +1,2 @@
 // created by zhuxietong on 2026-01-30 16:37
-export * from './ky';
+export * from './ky.js';

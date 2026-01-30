@@ -102,6 +102,109 @@ import { installGlobals } from './autoGen/global.install';
 installGlobals();
 ```
 
+## 故障排除
+
+### ESM 相关错误
+
+如果遇到类似以下错误：
+
+```
+ERROR: [plugin: externalize-deps] Failed to resolve "uniky/plugin". 
+This package is ESM only but it was tried to load by `require`.
+```
+
+**解决方案：**
+
+1. **确保项目 package.json 配置正确**
+
+在使用 `uniky` 的项目中，确保 `package.json` 包含：
+
+```json
+{
+  "type": "module"
+}
+```
+
+2. **确保 vite.config.ts 使用 ES 模块语法**
+
+```typescript
+// ✅ 正确 - 使用 import
+import { defineConfig } from 'vite';
+import uni from '@dcloudio/vite-plugin-uni';
+import { unikyPlugin } from 'uniky/plugin';
+
+export default defineConfig({
+  plugins: [uni(), ...unikyPlugin()]
+});
+
+// ❌ 错误 - 不要使用 require
+const { unikyPlugin } = require('uniky/plugin');
+```
+
+3. **配置 Vite 以正确处理 TypeScript 源码**
+
+如果使用的是 TypeScript 源码版本，确保 `vite.config.ts` 中正确配置：
+
+```typescript
+import { defineConfig } from 'vite';
+import uni from '@dcloudio/vite-plugin-uni';
+import { unikyPlugin } from 'uniky/plugin';
+
+export default defineConfig({
+  plugins: [uni(), ...unikyPlugin()],
+  optimizeDeps: {
+    // 排除 uniky 包，让 Vite 直接处理其 TS 源码
+    exclude: ['uniky']
+  }
+});
+```
+
+4. **检查 tsconfig.json 配置**
+
+确保项目的 `tsconfig.json` 支持 ESM：
+
+```json
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  }
+}
+```
+
+5. **检查 Node.js 版本**
+
+确保使用 Node.js 16+ 版本，该版本对 ESM 支持更好。
+
+6. **清除缓存后重试**
+
+```bash
+# 清除 node_modules 和 lock 文件
+rm -rf node_modules package-lock.json
+npm install
+
+# 或使用 pnpm/yarn
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
+
+# 清除 Vite 缓存
+rm -rf node_modules/.vite
+```
+
+7. **本地开发时使用 npm link**
+
+如果是本地开发调试 `uniky` 包：
+
+```bash
+# 在 uniky 目录
+npm link
+
+# 在使用项目目录
+npm link uniky
+```
+
 ## 架构说明
 
 本库直接发布 TypeScript 源码，不进行编译。这样做的好处：

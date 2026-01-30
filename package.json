@@ -1,26 +1,29 @@
 {
   "name": "uniky",
-  "version": "1.0.10",
+  "version": "1.0.13",
   "description": "uni-app 开发工具库，包含 hooks、http 请求和 vite 插件",
   "type": "module",
-  "main": "./src/lib/index.ts",
-  "module": "./src/lib/index.ts",
-  "types": "./src/lib/index.ts",
+  "main": "./dist/lib/index.js",
+  "module": "./dist/lib/index.js",
+  "types": "./dist/lib/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/lib/index.ts",
-      "import": "./src/lib/index.ts"
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/lib/index.js"
     },
     "./plugin": {
-      "types": "./src/plugin/index.ts",
-      "import": "./src/plugin/index.ts"
+      "types": "./dist/plugin/index.d.ts",
+      "import": "./dist/plugin/index.js"
     }
   },
+  "sideEffects": false,
   "files": [
-    "src",
+    "dist",
     "README.md"
   ],
   "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
     "publish:auto": "bash publish.sh"
   },
   "keywords": [
@@ -42,9 +45,9 @@
   "author": "zhuxietong",
   "license": "MIT",
   "peerDependencies": {
+    "@dcloudio/uni-app": "*",
     "vite": ">=4.0.0",
-    "vue": ">=3.0.0",
-    "@dcloudio/uni-app": "*"
+    "vue": ">=3.0.0"
   },
   "peerDependenciesMeta": {
     "vue": {
@@ -56,5 +59,10 @@
     "vite": {
       "optional": true
     }
+  },
+  "devDependencies": {
+    "@dcloudio/uni-app": "^2.0.2-4080720251210002",
+    "typescript": "^5.9.3",
+    "vue": "^3.5.27"
   }
 }
