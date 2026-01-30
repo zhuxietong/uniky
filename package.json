@@ -1,0 +1,60 @@
+{
+  "name": "uniky",
+  "version": "1.0.5",
+  "description": "uni-app 开发工具库，包含 hooks、http 请求和 vite 插件",
+  "type": "module",
+  "main": "./src/lib/index.ts",
+  "module": "./src/lib/index.ts",
+  "types": "./src/lib/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/lib/index.ts",
+      "import": "./src/lib/index.ts"
+    },
+    "./plugin": {
+      "types": "./src/plugin/index.ts",
+      "import": "./src/plugin/index.ts"
+    }
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "publish:auto": "bash publish.sh"
+  },
+  "keywords": [
+    "uni-app",
+    "uniapp",
+    "vue3",
+    "vite",
+    "plugin",
+    "hooks",
+    "http",
+    "pages",
+    "router",
+    "global"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zhuxietong/uniky.git"
+  },
+  "author": "zhuxietong",
+  "license": "MIT",
+  "peerDependencies": {
+    "vite": ">=4.0.0",
+    "vue": ">=3.0.0",
+    "@dcloudio/uni-app": "*"
+  },
+  "peerDependenciesMeta": {
+    "vue": {
+      "optional": true
+    },
+    "@dcloudio/uni-app": {
+      "optional": true
+    },
+    "vite": {
+      "optional": true
+    }
+  }
+}

@@ -1,0 +1,38 @@
+# Source files
+src
+tsconfig.json
+tsup.config.ts
+
+# Development files
+.vscode
+.idea
+*.log
+
+# Tests
+test
+tests
+__tests__
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+
+# Documentation
+docs
+
+# Configuration
+.editorconfig
+.prettierrc
+.eslintrc*
+
+# Git
+.git
+.gitignore
+
+# Examples
+examples
+demo
+
+# Development dependencies
+node_modules
