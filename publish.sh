@@ -3,6 +3,23 @@
 
 set -e
 
+OTP_CODE=""
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --otp=*)
+      OTP_CODE="${1#*=}"
+      shift
+      ;;
+    --otp)
+      OTP_CODE="$2"
+      shift 2
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
 if ! command -v gum &> /dev/null; then
   echo "❌ 错误: 未安装 gum"
   echo "请安装 gum: brew install gum"
@@ -96,15 +113,61 @@ echo ""
 gum style --foreground 245 "📤 正在发布到 https://www.npmjs.com ..."
 echo ""
 
-npm publish --access public 2>&1 | tee /tmp/npm-publish.log
+MAX_RETRY=3
+retry_count=0
+publish_success=false
 
-if [ ${PIPESTATUS[0]} -ne 0 ]; then
+while [ $retry_count -lt $MAX_RETRY ]; do
+  if [ -n "$OTP_CODE" ]; then
+    npm publish --access public --otp="$OTP_CODE" 2>&1 | tee /tmp/npm-publish.log
+  else
+    npm publish --access public 2>&1 | tee /tmp/npm-publish.log
+  fi
+  
+  if [ ${PIPESTATUS[0]} -eq 0 ]; then
+    publish_success=true
+    break
+  fi
+  
+  if grep -q "EOTP" /tmp/npm-publish.log; then
+    retry_count=$((retry_count + 1))
+    
+    if [ $retry_count -lt $MAX_RETRY ]; then
+      echo ""
+      gum style --foreground 214 "⚠️  需要 OTP 验证码 (尝试 $retry_count/$MAX_RETRY)"
+      echo ""
+      
+      if command -v gum &> /dev/null; then
+        OTP_CODE=$(gum input --placeholder "请输入 6 位验证码")
+      else
+        read -p "请输入 6 位验证码: " OTP_CODE
+      fi
+      
+      if [ -z "$OTP_CODE" ]; then
+        gum style --foreground 196 "❌ 验证码不能为空"
+        exit 1
+      fi
+      
+      gum style --foreground 245 "🔄 重新尝试发布..."
+      echo ""
+    else
+      break
+    fi
+  else
+    break
+  fi
+done
+
+if [ "$publish_success" = false ]; then
   echo ""
   gum style --foreground 196 "❌ 发布失败"
   echo ""
   gum style --foreground 214 "💡 可能的原因:"
   
-  if grep -q "403" /tmp/npm-publish.log; then
+  if grep -q "EOTP" /tmp/npm-publish.log; then
+    gum style --foreground 214 "   • OTP 验证码错误或已过期"
+    gum style --foreground 214 "   • 请重新运行: ./publish.sh --otp=YOUR_CODE"
+  elif grep -q "403" /tmp/npm-publish.log; then
     gum style --foreground 214 "   • 没有发布权限，包名可能已被占用"
     gum style --foreground 214 "   • 如果是首次发布 @uniky/core，需要创建组织或修改包名"
   elif grep -q "You must be logged in" /tmp/npm-publish.log; then
