@@ -1,5 +1,5 @@
 // 该插件用于作为 vite.config.ts 中 作为插件；
-// 该插件用于收集 src/autoGen/global文件夹下的ts文件 所有export 导出的内容， 并将其合并为一个全局定义文件 src/autoGen/global.d.ts 文件 同时，生成一个 /src/autoGen/global.install.ts 文件.
+// 该插件用于收集 src/.uniky/global文件夹下的ts文件 所有export 导出的内容， 并将其合并为一个全局定义文件 src/.uniky/global.d.ts 文件 同时，生成一个 /src/.uniky/global.install.ts 文件.
 // 以便在项目中全局使用这些类型定义，避免了手动维护全局类型定义文件的麻烦。
 
 import type { Plugin } from 'vite';
@@ -14,9 +14,9 @@ interface ExportInfo {
 }
 
 export default function globalDefinedPlugin(): Plugin {
-  const globalDir = 'src/autoGen/global';
-  const globalDtsPath = 'src/autoGen/global.d.ts';
-  const installTsPath = 'src/autoGen/global.install.ts';
+  const globalDir = 'src/.uniky/global';
+  const globalDtsPath = 'src/.uniky/global.d.ts';
+  const installTsPath = 'src/.uniky/global.install.ts';
 
   /**
    * 递归获取目录下所有 .ts 文件（排除 .d.ts 和 install.ts）
@@ -158,7 +158,7 @@ export default function globalDefinedPlugin(): Plugin {
 
     // 按文件分组导出
     for (const exp of allExports) {
-      const relativePath = path.relative('src/autoGen', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '');
+      const relativePath = path.relative('src/.uniky', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '');
       if (!imports.has(relativePath)) {
         imports.set(relativePath, new Set());
       }
@@ -187,11 +187,11 @@ export default function globalDefinedPlugin(): Plugin {
     if (globalItems.length > 0) {
       for (const exp of globalItems) {
         if (exp.type === 'function') {
-          content += `  const ${exp.name}: typeof import('./${path.relative('src/autoGen', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '')}').${exp.name};\n`;
+          content += `  const ${exp.name}: typeof import('./${path.relative('src/.uniky', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '')}').${exp.name};\n`;
         } else if (exp.type === 'const') {
-          content += `  const ${exp.name}: typeof import('./${path.relative('src/autoGen', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '')}').${exp.name};\n`;
+          content += `  const ${exp.name}: typeof import('./${path.relative('src/.uniky', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '')}').${exp.name};\n`;
         } else if (exp.type === 'class') {
-          content += `  const ${exp.name}: typeof import('./${path.relative('src/autoGen', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '')}').${exp.name};\n`;
+          content += `  const ${exp.name}: typeof import('./${path.relative('src/.uniky', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '')}').${exp.name};\n`;
         }
       }
     }
@@ -210,7 +210,7 @@ export default function globalDefinedPlugin(): Plugin {
 
     // 按文件分组导出
     for (const exp of allExports) {
-      const relativePath = './global/' + path.relative(path.join('src', 'autoGen', 'global'), exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '');
+      const relativePath = './global/' + path.relative(path.join('src', '.uniky', 'global'), exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '');
       if (!imports.has(relativePath)) {
         imports.set(relativePath, { names: new Set(), hasDefault: false });
       }
@@ -247,7 +247,7 @@ export default function globalDefinedPlugin(): Plugin {
     // 将导出的内容挂载到 globalThis
     const globalItems = allExports.filter(exp => exp.type !== 'interface' && exp.type !== 'type');
     for (const exp of globalItems) {
-      const name = exp.isDefault ? (imports.get('./global/' + path.relative(path.join('src', 'autoGen', 'global'), exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, ''))?.defaultName || exp.name) : exp.name;
+      const name = exp.isDefault ? (imports.get('./global/' + path.relative(path.join('src', '.uniky', 'global'), exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, ''))?.defaultName || exp.name) : exp.name;
       content += `  (globalThis as any).${exp.name} = ${name};\n`;
     }
 
@@ -305,25 +305,25 @@ export default function globalDefinedPlugin(): Plugin {
     },
 
     configureServer(server) {
-      // 监听 src/autoGen/global 目录下的文件变化
+      // 监听 src/.uniky/global 目录下的文件变化
       server.watcher.add(globalDir);
 
       server.watcher.on('change', (file) => {
-        if (file.includes('src/autoGen/global') && file.endsWith('.ts') && !file.endsWith('.d.ts') && !file.includes('global.install.ts')) {
+        if (file.includes('src/.uniky/global') && file.endsWith('.ts') && !file.endsWith('.d.ts') && !file.includes('global.install.ts')) {
           console.log(`[globalDefined] 检测到文件变化: ${file}`);
           generate();
         }
       });
 
       server.watcher.on('add', (file) => {
-        if (file.includes('src/autoGen/global') && file.endsWith('.ts') && !file.endsWith('.d.ts') && !file.includes('global.install.ts')) {
+        if (file.includes('src/.uniky/global') && file.endsWith('.ts') && !file.endsWith('.d.ts') && !file.includes('global.install.ts')) {
           console.log(`[globalDefined] 检测到新文件: ${file}`);
           generate();
         }
       });
 
       server.watcher.on('unlink', (file) => {
-        if (file.includes('src/autoGen/global') && file.endsWith('.ts') && !file.endsWith('.d.ts') && !file.includes('global.install.ts')) {
+        if (file.includes('src/.uniky/global') && file.endsWith('.ts') && !file.endsWith('.d.ts') && !file.includes('global.install.ts')) {
           console.log(`[globalDefined] 检测到文件删除: ${file}`);
           generate();
         }
