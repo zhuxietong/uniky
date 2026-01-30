@@ -33,6 +33,7 @@ yarn-error.log*
 src/autoGen/global.d.ts
 src/autoGen/global.install.ts
 src/autoGen/global/pages.ts
+.uniky
 
 # Cache
 .cache

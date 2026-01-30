@@ -4,10 +4,10 @@ uni-app 开发工具库，提供常用的 hooks、http 请求封装和 vite 插�
 
 ## 特性
 
-- ✅ 直接使用 TypeScript 源码，无需编译
+- ✅ 混合发布模式：lib 使用 TS 源码，plugin 编译为 JS
 - ✅ 与用户项目共享依赖，避免冲突
 - ✅ 完整的类型支持
-- ✅ 开箱即用的 Vite 插件
+- ✅ 开箱即用的 Vite 插件，兼容各种构建环境
 
 ## 安装
 
@@ -207,14 +207,26 @@ npm link uniky
 
 ## 架构说明
 
-本库直接发布 TypeScript 源码，不进行编译。这样做的好处：
+本库采用**混合发布模式**：
 
-1. **避免依赖冲突**：使用项目自己的 vue、@dcloudio/uni-app 等依赖
-2. **类型支持更好**：直接使用源码类型定义
-3. **调试更方便**：可以直接查看和调试源码
-4. **体积更小**：不包含编译后的代码
+### lib 部分 - TypeScript 源码
+- 直接发布 TS 源码（`src/lib/**/*`）
+- 由用户项目的构建工具（Vite）处理编译
+- 优势：
+  - 避免依赖冲突，使用项目自己的 vue、@dcloudio/uni-app 等依赖
+  - 类型支持更好，直接使用源码类型定义
+  - 调试更方便，可以直接查看和调试源码
+  - 体积更小，不包含编译后的代码
 
-用户项目的构建工具（如 Vite）会自动处理这些 TypeScript 文件的编译。
+### plugin 部分 - 编译后的 JavaScript
+- 编译为 JS 文件（`dist/plugin/**/*`）
+- 包含完整的类型定义（`.d.ts` 文件）
+- 原因：
+  - Vite 配置文件在加载时使用 esbuild
+  - esbuild 在某些环境下会尝试用 `require()` 加载模块
+  - 编译为 JS 可以避免 ESM 兼容性问题
+
+这种混合模式结合了两种方式的优势，既保持了库的灵活性，又确保了插件的兼容性。
 
 ## 发布
 
@@ -253,6 +265,41 @@ npm run publish:auto
 4. 预览源码目录结构
 5. 确认后发布到 npm
 6. 可选自动提交到 git
+
+## 开发说明
+
+### 本地开发
+
+1. 克隆仓库
+```bash
+git clone https://github.com/zhuxietong/uniky.git
+cd uniky
+```
+
+2. 安装依赖
+```bash
+npm install
+```
+
+3. 构建 plugin（仅编译 plugin 部分）
+```bash
+npm run build
+```
+
+4. 链接到本地项目
+```bash
+npm link
+cd /path/to/your-project
+npm link uniky
+```
+
+### 发布流程
+
+```bash
+npm run publish:auto
+```
+
+发布前会自动执行 `npm run build`，编译 plugin 部分。
 
 ## License
 
