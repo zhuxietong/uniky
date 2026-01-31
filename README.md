@@ -19,6 +19,70 @@ pnpm add uniky
 yarn add uniky
 ```
 
+## 安装后设置
+
+> 📖 **详细文档**: [安装机制完整说明](./docs/INSTALLATION.md)
+
+### 自动安装（推荐）
+
+安装 `uniky` 后，插件文件会自动安装到项目根目录的 `.uniky` 文件夹。
+
+如果自动安装失败或删除了 `.uniky` 文件夹，可以手动触发安装：
+
+```bash
+# 方式 1: 使用 npx（推荐）
+npx uniky-install
+
+# 方式 2: 直接运行脚本
+node node_modules/uniky/scripts/postinstall.js
+
+# 方式 3: 重新安装包
+npm install uniky --force
+```
+
+### bin 命令说明
+
+`uniky-install` 是一个可执行命令，通过 `package.json` 中的 `bin` 字段注册：
+
+```json
+{
+  "bin": {
+    "uniky-install": "./scripts/postinstall.js"
+  }
+}
+```
+
+**工作原理：**
+
+1. 当你在项目中安装 `uniky` 时，npm 会自动在 `node_modules/.bin/` 目录下创建 `uniky-install` 命令的软链接
+2. 这个命令指向 `node_modules/uniky/scripts/postinstall.js` 脚本
+3. 使用 `npx uniky-install` 可以直接执行该脚本，无需记住具体路径
+
+**使用场景：**
+
+- 删除了 `.uniky` 文件夹后需要重新生成
+- 更新 `uniky` 包后需要更新插件文件
+- CI/CD 环境中确保插件文件存在
+- 调试插件安装问题
+
+**执行效果：**
+
+```bash
+$ npx uniky-install
+[uniky] 开始安装插件文件...
+[uniky] 项目根目录: /path/to/your-project
+[uniky] 目标目录: /path/to/your-project/.uniky
+[uniky] 创建目录: /path/to/your-project/.uniky
+[uniky] 源目录: /path/to/your-project/node_modules/uniky/src/plugin
+[uniky] 拷贝了 5 个文件
+[uniky] 创建索引文件: /path/to/your-project/.uniky/index.ts
+[uniky] ✅ 插件文件已成功安装到 /path/to/your-project/.uniky (5 个文件)
+```
+
+### 自动检测安装
+
+如果 `.uniky` 文件夹缺失，在首次运行 Vite 时，插件会自动检测并安装所需文件。这是最后的保障机制。
+
 ## 使用
 
 ### 库功能
@@ -97,9 +161,33 @@ _To.back();
 在 `main.ts` 中安装全局定义：
 
 ```typescript
-import { installGlobals } from './autoGen/global.install';
+import { installGlobals } from './_unikey/global.install';
 
 installGlobals();
+```
+
+## 目录结构
+
+安装后，项目根目录会生成 `.uniky` 文件夹：
+
+```
+your-project/
+├── .uniky/
+│   ├── index.ts
+│   └── plugin/
+│       ├── index.ts
+│       ├── pages.defined.ts
+│       ├── global.defined.ts
+│       ├── http.defined.ts
+│       └── lib.defined.ts
+├── src/
+│   └── _unikey/           # 插件自动生成的文件
+│       ├── global/
+│       │   ├── pages.ts
+│       │   └── ky.ts
+│       ├── global.d.ts
+│       └── global.install.ts
+└── vite.config.ts
 ```
 
 ## 故障排除

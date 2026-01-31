@@ -1,6 +1,6 @@
 {
   "name": "uniky",
-  "version": "1.0.19",
+  "version": "1.0.22",
   "description": "uni-app 开发工具库，包含 hooks、http 请求和 vite 插件",
   "type": "module",
   "main": "./src/lib/index.ts",
@@ -16,11 +16,15 @@
       "import": "./src/plugin/index.ts"
     }
   },
+  "bin": {
+    "uniky-install": "./scripts/postinstall.js"
+  },
   "sideEffects": false,
   "files": [
     "src/lib",
     "src/plugin",
     "scripts",
+    "docs",
     "README.md"
   ],
   "scripts": {
