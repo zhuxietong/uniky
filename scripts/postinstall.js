@@ -36,6 +36,30 @@ function findProjectRoot() {
   return process.cwd();
 }
 
+function copyDirectorySkipExisting(source, target) {
+  if (!existsSync(target)) {
+    mkdirSync(target, { recursive: true });
+  }
+
+  const files = readdirSync(source);
+  let count = 0;
+
+  files.forEach(file => {
+    const sourcePath = join(source, file);
+    const targetPath = join(target, file);
+    const stat = statSync(sourcePath);
+
+    if (stat.isDirectory()) {
+      count += copyDirectorySkipExisting(sourcePath, targetPath);
+    } else if (!existsSync(targetPath)) {
+      copyFileSync(sourcePath, targetPath);
+      count++;
+    }
+  });
+
+  return count;
+}
+
 function copyDirectoryRecursive(source, target) {
   if (!existsSync(target)) {
     mkdirSync(target, { recursive: true });
@@ -96,6 +120,17 @@ export * from './plugin/index.js';
     console.log(`[uniky] 创建索引文件: ${join(unikyDir, 'index.ts')}`);
 
     console.log(`[uniky] ✅ 插件文件已成功安装到 ${unikyDir} (${copiedCount} 个文件)`);
+
+    const skillsSourceDir = join(__dirname, '..', 'src', 'plugin', '.skills');
+    const skillsTargetDir = join(projectRoot, '.skills');
+    if (existsSync(skillsSourceDir)) {
+      const skillsCopied = copyDirectorySkipExisting(skillsSourceDir, skillsTargetDir);
+      if (skillsCopied > 0) {
+        console.log(`[uniky] ✅ .skills 拷贝了 ${skillsCopied} 个新文件到 ${skillsTargetDir}`);
+      } else {
+        console.log(`[uniky] .skills 文件已存在，跳过拷贝`);
+      }
+    }
   } catch (error) {
     console.error('[uniky] ❌ 插件文件安装失败:', error);
     console.error('[uniky] 错误堆栈:', error.stack);
