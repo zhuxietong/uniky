@@ -30,7 +30,7 @@ description: 根据给出路径去创建一个uni-app 的页面
 }
 ```
 
-如果路径以`pages-`开头 例如pages-order/list/query则作为子报添加到 subPackages 子模块中
+如果路径以`pages-`开头， 例如pages-order/list/query则作为子报添加到 subPackages 子模块中
 
 ```jsonc
 {

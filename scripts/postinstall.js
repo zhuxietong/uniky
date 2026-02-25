@@ -124,11 +124,23 @@ export * from './plugin/index.js';
     const skillsSourceDir = join(__dirname, '..', 'src', 'plugin', '.skills');
     const skillsTargetDir = join(projectRoot, '.skills');
     if (existsSync(skillsSourceDir)) {
-      const skillsCopied = copyDirectorySkipExisting(skillsSourceDir, skillsTargetDir);
+      if (!existsSync(skillsTargetDir)) {
+        mkdirSync(skillsTargetDir, { recursive: true });
+      }
+      const sourceFiles = readdirSync(skillsSourceDir).filter(f => statSync(join(skillsSourceDir, f)).isFile());
+      let skillsCopied = 0;
+      sourceFiles.forEach(file => {
+        const targetPath = join(skillsTargetDir, file);
+        if (!existsSync(targetPath)) {
+          copyFileSync(join(skillsSourceDir, file), targetPath);
+          skillsCopied++;
+          console.log(`[uniky] .skills 新增文件: ${file}`);
+        }
+      });
       if (skillsCopied > 0) {
         console.log(`[uniky] ✅ .skills 拷贝了 ${skillsCopied} 个新文件到 ${skillsTargetDir}`);
       } else {
-        console.log(`[uniky] .skills 文件已存在，跳过拷贝`);
+        console.log(`[uniky] .skills 所有文件已存在，跳过拷贝`);
       }
     }
   } catch (error) {
