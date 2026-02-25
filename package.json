@@ -1,6 +1,6 @@
 {
   "name": "uniky",
-  "version": "1.0.26",
+  "version": "1.0.27",
   "description": "uni-app 开发工具库，包含 hooks、http 请求和 vite 插件",
   "type": "module",
   "main": "./src/lib/index.ts",

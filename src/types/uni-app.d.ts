@@ -68,5 +68,3 @@ declare namespace UniApp {
     onHeadersReceived(callback: (result: any) => void): void
   }
 }
-
-
