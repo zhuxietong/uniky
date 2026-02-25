@@ -6,7 +6,7 @@
 
 ### 1. global.defined.ts - 全局定义插件
 
-自动收集 `src/_unikey/global` 文件夹下的所有导出内容，生成全局类型定义和安装文件。
+自动收集 `src/_uniky/global` 文件夹下的所有导出内容，生成全局类型定义和安装文件。
 
 ### 2. pages.defined.ts - 页面路由插件
 
@@ -23,7 +23,7 @@
 1. 插件会读取项目中的 OpenAPI 规范文件（支持多个位置）
 2. 解析所有 API 路径和方法
 3. 自动生成对应的请求函数
-4. 生成的代码保存到 `src/_unikey/global/ky.ts`
+4. 生成的代码保存到 `src/_uniky/global/ky.ts`
 
 ### OpenAPI 文件位置
 
@@ -68,12 +68,12 @@ export function apiSysAccountLogin(data?: any, params?: any) {
 
 ```typescript
 // 直接调用
-import { apiSysAccountLogin } from '@/_unikey/global/ky';
+import { apiSysAccountLogin } from '@/_uniky/global/ky';
 
 await apiSysAccountLogin({ username: 'admin', password: '123456' });
 
 // 使用 Hook
-import { useKyData, apiPitfallIndexQuery } from '@/_unikey/global/ky';
+import { useKyData, apiPitfallIndexQuery } from '@/_uniky/global/ky';
 
 const { data, run } = useKyData(apiPitfallIndexQuery, []);
 ```
@@ -85,7 +85,7 @@ const { data, run } = useKyData(apiPitfallIndexQuery, []);
 1. 项目启动时（如果文件不存在）
 2. OpenAPI 规范文件发生变化时
 
-如果需要手动触发重新生成，删除 `src/_unikey/global/ky.ts` 文件后重启开发服务器。
+如果需要手动触发重新生成，删除 `src/_uniky/global/ky.ts` 文件后重启开发服务器。
 
 ### 配置选项
 

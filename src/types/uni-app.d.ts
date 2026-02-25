@@ -69,7 +69,4 @@ declare namespace UniApp {
   }
 }
 
-declare const uni: {
-  request(options: UniApp.RequestOptions): UniApp.RequestTask
-  [key: string]: any
-}
+

@@ -248,7 +248,7 @@ export default function pagesDefinedPlugin(): Plugin {
     configResolved(config) {
       // 确定 src 目录和输出路径
       srcDir = path.resolve(config.root, 'src');
-      outputPath = path.resolve(srcDir, '_unikey/global/pages.ts');
+      outputPath = path.resolve(srcDir, '_uniky/global/pages.ts');
     },
 
     buildStart() {

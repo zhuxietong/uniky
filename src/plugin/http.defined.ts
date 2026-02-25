@@ -1,13 +1,13 @@
 // created by zhuxietong on 2026-01-30 23:22
 // 该插件用于生成基础的 HTTP 请求配置
-// 生成的代码将保存到 src/_unikey/global/ky.ts
+// 生成的代码将保存到 src/_uniky/global/ky.ts
 
 import type { Plugin } from 'vite';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 export default function httpDefinedPlugin(): Plugin {
-  const outputPath = 'src/_unikey/global/ky.ts';
+  const outputPath = 'src/_uniky/global/ky.ts';
 
   /**
    * 生成基础请求配置代码

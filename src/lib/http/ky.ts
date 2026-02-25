@@ -209,9 +209,9 @@ class UniKyBase {
     originalUrl: string,
   ): Promise<UniKyResponse> {
     return new Promise((resolve, reject) => {
-      uni.request({
+      ;(uni.request as any)({
         ...options,
-        success: (res) => {
+        success: (res: any) => {
           const response: UniKyResponse = {
             data: res.data,
             statusCode: res.statusCode,
@@ -229,7 +229,7 @@ class UniKyBase {
             reject(response)
           }
         },
-        fail: (err) => {
+        fail: (err: any) => {
           reject({
             ...err,
             ok: false,

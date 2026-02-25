@@ -1,5 +1,5 @@
 // 该插件用于作为 vite.config.ts 中 作为插件；
-// 该插件用于收集 src/_unikey/global文件夹下的ts文件 所有export 导出的内容， 并将其合并为一个全局定义文件 src/_unikey/global.d.ts 文件 同时，生成一个 /src/_unikey/global.install.ts 文件.
+// 该插件用于收集 src/_uniky/global文件夹下的ts文件 所有export 导出的内容， 并将其合并为一个全局定义文件 src/_uniky/global.d.ts 文件 同时，生成一个 /src/_uniky/global.install.ts 文件.
 // 以便在项目中全局使用这些类型定义，避免了手动维护全局类型定义文件的麻烦。
 
 import type { Plugin } from 'vite';
@@ -14,9 +14,9 @@ interface ExportInfo {
 }
 
 export default function globalDefinedPlugin(): Plugin {
-  const globalDir = 'src/_unikey/global';
-  const globalDtsPath = 'src/_unikey/global.d.ts';
-  const installTsPath = 'src/_unikey/global.install.ts';
+  const globalDir = 'src/_uniky/global';
+  const globalDtsPath = 'src/_uniky/global.d.ts';
+  const installTsPath = 'src/_uniky/global.install.ts';
 
   /**
    * 递归获取目录下所有 .ts 文件（排除 .d.ts 和 install.ts）
@@ -158,7 +158,7 @@ export default function globalDefinedPlugin(): Plugin {
 
     // 按文件分组导出
     for (const exp of allExports) {
-      const relativePath = path.relative('src/_unikey', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '');
+      const relativePath = path.relative('src/_uniky', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '');
       if (!imports.has(relativePath)) {
         imports.set(relativePath, new Set());
       }
@@ -187,11 +187,11 @@ export default function globalDefinedPlugin(): Plugin {
     if (globalItems.length > 0) {
       for (const exp of globalItems) {
         if (exp.type === 'function') {
-          content += `  const ${exp.name}: typeof import('./${path.relative('src/_unikey', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '')}').${exp.name};\n`;
+          content += `  const ${exp.name}: typeof import('./${path.relative('src/_uniky', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '')}').${exp.name};\n`;
         } else if (exp.type === 'const') {
-          content += `  const ${exp.name}: typeof import('./${path.relative('src/_unikey', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '')}').${exp.name};\n`;
+          content += `  const ${exp.name}: typeof import('./${path.relative('src/_uniky', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '')}').${exp.name};\n`;
         } else if (exp.type === 'class') {
-          content += `  const ${exp.name}: typeof import('./${path.relative('src/_unikey', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '')}').${exp.name};\n`;
+          content += `  const ${exp.name}: typeof import('./${path.relative('src/_uniky', exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '')}').${exp.name};\n`;
         }
       }
     }
@@ -210,7 +210,7 @@ export default function globalDefinedPlugin(): Plugin {
 
     // 按文件分组导出
     for (const exp of allExports) {
-      const relativePath = './global/' + path.relative(path.join('src', '_unikey', 'global'), exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '');
+      const relativePath = './global/' + path.relative(path.join('src', '_uniky', 'global'), exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, '');
       if (!imports.has(relativePath)) {
         imports.set(relativePath, { names: new Set(), hasDefault: false });
       }
@@ -247,7 +247,7 @@ export default function globalDefinedPlugin(): Plugin {
     // 将导出的内容挂载到 globalThis
     const globalItems = allExports.filter(exp => exp.type !== 'interface' && exp.type !== 'type');
     for (const exp of globalItems) {
-      const name = exp.isDefault ? (imports.get('./global/' + path.relative(path.join('src', '_unikey', 'global'), exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, ''))?.defaultName || exp.name) : exp.name;
+      const name = exp.isDefault ? (imports.get('./global/' + path.relative(path.join('src', '_uniky', 'global'), exp.filePath).replace(/\\/g, '/').replace(/\.ts$/, ''))?.defaultName || exp.name) : exp.name;
       content += `  (globalThis as any).${exp.name} = ${name};\n`;
     }
 
@@ -305,25 +305,25 @@ export default function globalDefinedPlugin(): Plugin {
     },
 
     configureServer(server) {
-      // 监听 src/_unikey/global 目录下的文件变化
+      // 监听 src/_uniky/global 目录下的文件变化
       server.watcher.add(globalDir);
 
       server.watcher.on('change', (file) => {
-        if (file.includes('src/_unikey/global') && file.endsWith('.ts') && !file.endsWith('.d.ts') && !file.includes('global.install.ts')) {
+        if (file.includes('src/_uniky/global') && file.endsWith('.ts') && !file.endsWith('.d.ts') && !file.includes('global.install.ts')) {
           console.log(`[globalDefined] 检测到文件变化: ${file}`);
           generate();
         }
       });
 
       server.watcher.on('add', (file) => {
-        if (file.includes('src/_unikey/global') && file.endsWith('.ts') && !file.endsWith('.d.ts') && !file.includes('global.install.ts')) {
+        if (file.includes('src/_uniky/global') && file.endsWith('.ts') && !file.endsWith('.d.ts') && !file.includes('global.install.ts')) {
           console.log(`[globalDefined] 检测到新文件: ${file}`);
           generate();
         }
       });
 
       server.watcher.on('unlink', (file) => {
-        if (file.includes('src/_unikey/global') && file.endsWith('.ts') && !file.endsWith('.d.ts') && !file.includes('global.install.ts')) {
+        if (file.includes('src/_uniky/global') && file.endsWith('.ts') && !file.endsWith('.d.ts') && !file.includes('global.install.ts')) {
           console.log(`[globalDefined] 检测到文件删除: ${file}`);
           generate();
         }
