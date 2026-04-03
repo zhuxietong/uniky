@@ -61,17 +61,14 @@ const props = defineProps<{
 }>();
 
 let value = IconMap[props.name] || "&#xe68f;";
-value = value.replace("&#x", "%u").replace(";", "");
-value = unescape(value);
+value = String.fromCodePoint(parseInt(value.replace("&#x", "").replace(";", ""), 16));
 const icon = ref(value);
 
 watch(
     () => props.name,
     (val) => {
         let iconStr = IconMap[val];
-        iconStr = iconStr.replace("&#x", "%u").replace(";", "");
-        iconStr = unescape(iconStr);
-        icon.value = iconStr;
+        icon.value = String.fromCodePoint(parseInt(iconStr.replace("&#x", "").replace(";", ""), 16));
     },
 );
 </script>
