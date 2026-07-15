@@ -171,25 +171,54 @@ const buildUrl = (path: string, query?: Record<string, any>, json?: Record<strin
   return params.length > 0 ? \`\${fullPath}?\${params.join('&')}\` : fullPath;
 };
 
+// 导航锁：修复安卓小程序下 @tap 重复触发导致的重复跳转
+let isNavigating = false;
+let navResetTimer: ReturnType<typeof setTimeout> | null = null;
+
+const beginNavigate = (): boolean => {
+  if (isNavigating) return false;
+  isNavigating = true;
+  if (navResetTimer) clearTimeout(navResetTimer);
+  // 兜底：异常情况下（complete 未回调）自动释放锁
+  navResetTimer = setTimeout(() => {
+    isNavigating = false;
+    navResetTimer = null;
+  }, 1000);
+  return true;
+};
+
+const endNavigate = () => {
+  if (navResetTimer) {
+    clearTimeout(navResetTimer);
+    navResetTimer = null;
+  }
+  isNavigating = false;
+};
+
 const ToRoute: ToRouteInterface = {
   navigate: (path, options) => {
+    if (!beginNavigate()) return;
     const url = buildUrl(path, options?.query, options?.json);
-    uni.navigateTo({ url });
+    uni.navigateTo({ url, complete: endNavigate });
   },
   redirect: (path, options) => {
+    if (!beginNavigate()) return;
     const url = buildUrl(path, options?.query, options?.json);
-    uni.redirectTo({ url });
+    uni.redirectTo({ url, complete: endNavigate });
   },
   switchTab: (path, options) => {
+    if (!beginNavigate()) return;
     const url = buildUrl(path, options?.query, options?.json);
-    uni.switchTab({ url });
+    uni.switchTab({ url, complete: endNavigate });
   },
   reLaunch: (path, options) => {
+    if (!beginNavigate()) return;
     const url = buildUrl(path, options?.query, options?.json);
-    uni.reLaunch({ url });
+    uni.reLaunch({ url, complete: endNavigate });
   },
   back: (delta = 1) => {
-    uni.navigateBack({ delta });
+    if (!beginNavigate()) return;
+    uni.navigateBack({ delta, complete: endNavigate });
   }
 };
 
